@@ -1,0 +1,142 @@
+--1. Print names of the classrooms where the teacher "Edward Hop-
+--per" lectures.
+
+SELECT LR.[Name]
+FROM Teachers AS T
+INNER JOIN Lectures AS L
+ON T.[Id]=L.[TeacherId]
+INNER JOIN Schedules AS S
+ON L.[Id]=S.[LectureId]
+INNER JOIN LectureRooms AS LR
+ON LR.[Id]=S.[LectureRoomId]
+WHERE T.[Name]='Liza'
+
+
+--2. Print names of the assistants who deliver lectures for the group
+--"F505".
+
+SELECT T.[Name]
+FROM Groups AS G
+INNER JOIN GroupsLectures AS GL
+ON G.[Id]=GL.[GroupId]
+INNER JOIN Lectures AS L
+ON GL.[LectureId]=L.[Id]
+INNER JOIN Teachers AS T
+ON T.[Id]=L.[TeacherId]
+INNER JOIN Assistants AS A
+ON A.[TeacherId]=T.[Id]
+WHERE G.[Name]='Software Developer'
+
+
+--3. Print subjects taught by the teacher "Alex Carmack" for groups
+--of the 5th year.
+
+SELECT S.[Name]
+FROM Groups AS G
+INNER JOIN GroupsLectures AS GL
+ON GL.[GroupId]=G.[Id]
+INNER JOIN Lectures AS L
+ON L.[Id]=GL.[LectureId]
+INNER JOIN Teachers AS T
+ON T.[Id]=L.[TeacherId]
+INNER JOIN Subjects AS S
+ON S.[Id]=L.[SubjectId]
+WHERE G.[Year]=5
+
+
+--4 Print names of the teachers who do not deliver lectures on
+--Mondays.
+
+SELECT T.[Name]
+FROM Schedules AS S
+INNER JOIN Lectures AS L
+ON L.[Id]=S.[LectureId]
+INNER JOIN Teachers AS T
+ON T.[Id]=L.[TeacherId]
+WHERE S.[DayOfWeek]!=1
+
+
+--5. Print names of the classrooms, indicating their buildings, in
+--which there are no lectures on Wednesday of the second week
+--on the third double period.
+
+SELECT LR.[Name], LR.[Building]
+FROM Schedules AS S
+INNER JOIN Lectures AS L
+ON L.Id = S.LectureId
+INNER JOIN LectureRooms AS LR
+ON LR.Id = S.LectureRoomId 
+WHERE S.[Week] % 4 = 2 AND S.[DayOfWeek] = 5 
+
+
+--6. Print full names of teachers of the Computer Science faculty,
+--who do not supervise groups of the Software Development de-
+--partment.
+
+SELECT T.[Name],T.[Surname]
+FROM Departments AS D
+INNER JOIN Faculties AS F
+ON F.[Id]=D.[FacultyId]
+INNER JOIN Deans AS DE
+ON DE.[Id]=F.[DeanId]
+INNER JOIN Teachers AS T
+ON T.[Id]=DE.[TeacherId]
+WHERE F.[Name]='Izio'
+
+--7 Print numbers of all buildings that are available in the tables
+--of faculties, departments, and classrooms.
+
+SELECT LR.[Name] AS LectureRoomName, LR.[Building] AS LectureRoomBuilding,
+		D.[Name] AS DeparmentName, D.[Building] AS DepartmentBuilding,
+		F.[Name] AS FacultyName, F.[Building] AS FacultyBuilding
+FROM LectureRooms AS LR
+INNER JOIN Schedules AS S
+ON S.LectureRoomId = LR.Id
+INNER JOIN Lectures AS L
+ON L.Id = S.LectureId
+INNER JOIN GroupsLectures AS GL
+ON GL.LectureId = L.Id
+INNER JOIN Groups AS G
+ON G.Id = GL.GroupId
+INNER JOIN Departments AS D
+ON D.Id=G.DepartmentId
+INNER JOIN Faculties AS F
+ON F.Id=D.FacultyId
+
+
+
+--8 Print full names of teachers in the following order: deans of
+--faculties, heads of departments, teachers, curators, assistants.
+
+SELECT T.[Name] + ' ' + T.[Surname] AS TeacherFullName 
+FROM Faculties AS F
+INNER JOIN Deans AS D
+ON F.DeanId=D.Id
+INNER JOIN Teachers AS T
+ON T.Id=D.TeacherId
+INNER JOIN Heads AS H
+ON H.TeacherId=T.Id
+INNER JOIN Departments AS DP
+ON DP.HeadId = H.Id
+INNER JOIN Curators AS C
+ON T.Id = C.TeacherId
+INNER JOIN Assistants AS A
+ON A.TeacherId= T.Id
+
+
+-- 9. Print days of the week (without repetitions), in which there are
+--classes in the classrooms "A311" and "A104" of the building 6.
+
+SELECT G.[Name] AS GroupName, S.[DayOfWeek] AS SchedulesDayOfWeek, 
+	   LR.[Building] AS LectureRoomBuilding
+FROM LectureRooms AS LR
+INNER JOIN Schedules AS S
+ON S.LectureRoomId =LR.Id
+INNER JOIN Lectures AS L
+ON L.Id=S.LectureId
+INNER JOIN dbo.GroupsLectures AS GL
+ON GL.LectureId=L.Id
+INNER JOIN Groups AS G
+ON G.Id = GL.GroupId
+WHERE LR.[Building] = 2 AND LR.[Name] ='Nobe Renoden' OR LR.[Name]='Moira Nizet'
+
